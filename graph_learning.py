@@ -134,32 +134,28 @@ def run_simulation(type: str, num_runs: int, **kwargs):
         num_bars (int): number of bars in barbells+
         num_symbols (int): optional, defaults to NUM_SYMBOLS constant 
     """
-    g = None
-    pop = None
-
-    match type:
-        case 'regular':
-            g, pop = create_regular_graph_w_pop(kwargs['nodes_a'], kwargs['neighbors'],
-                                                kwargs['num_symbols'] if 'num_symbols' in kwargs else NUM_SYMBOLS)
-        case 'small_world':
-            g, pop = create_small_world_graph_w_pop(kwargs['nodes_a'], kwargs['neighbors'], kwargs['rewire_odds'],
-                                                    kwargs['num_symbols'] if 'num_symbols' in kwargs else NUM_SYMBOLS)
-        case 'barbells':
-            g, pop = create_2bell_bars_graph_w_pop(kwargs['nodes_a'], kwargs['nodes_b'], kwargs['len_bar'], kwargs['num_bars'],
-                                                   kwargs['num_symbols'] if 'num_symbols' in kwargs else NUM_SYMBOLS)
-        case 'bipartite':
-            g, pop = create_bipartite_graph_w_pop(kwargs['nodes_a'], kwargs['nodes_b'],
-                                                  kwargs['num_symbols'] if 'num_symbols' in kwargs else NUM_SYMBOLS)
-        case 'lollipop':
-            g, pop = create_lollipop_graph_w_pop(kwargs['nodes_a'], kwargs['nodes_b'],
-                                                 kwargs['num_symbols'] if 'num_symbols' in kwargs else NUM_SYMBOLS)
 
     distinctnesses = []  # 2d array
     for i in range(num_runs):
         run_distinctnesses = []
 
-        run_g = g.copy()
-        run_pop = pop.copy()
+        match type:
+            case 'regular':
+                run_g, run_pop = create_regular_graph_w_pop(kwargs['nodes_a'], kwargs['neighbors'],
+                                                            kwargs['num_symbols'] if 'num_symbols' in kwargs else NUM_SYMBOLS)
+            case 'small_world':
+                run_g, run_pop = create_small_world_graph_w_pop(kwargs['nodes_a'], kwargs['neighbors'], kwargs['rewire_odds'],
+                                                                kwargs['num_symbols'] if 'num_symbols' in kwargs else NUM_SYMBOLS)
+            case 'barbells':
+                run_g, run_pop = create_2bell_bars_graph_w_pop(kwargs['nodes_a'], kwargs['nodes_b'], kwargs['len_bar'], kwargs['num_bars'],
+                                                               kwargs['num_symbols'] if 'num_symbols' in kwargs else NUM_SYMBOLS)
+            case 'bipartite':
+                run_g, run_pop = create_bipartite_graph_w_pop(kwargs['nodes_a'], kwargs['nodes_b'],
+                                                              kwargs['num_symbols'] if 'num_symbols' in kwargs else NUM_SYMBOLS)
+            case 'lollipop':
+                run_g, run_pop = create_lollipop_graph_w_pop(kwargs['nodes_a'], kwargs['nodes_b'],
+                                                             kwargs['num_symbols'] if 'num_symbols' in kwargs else NUM_SYMBOLS)
+
         while not np.allclose(run_pop, run_pop[0], atol=1e-10):
             run_simulation_step(run_g, run_pop)
 
@@ -167,6 +163,7 @@ def run_simulation(type: str, num_runs: int, **kwargs):
                 (np.mean([distinctness(run_pop[k], run_pop) for k in range(len(run_pop))])))
 
         distinctnesses.append(run_distinctnesses)
+        print(f"{len(distinctnesses)}/{num_runs}")
 
     return distinctnesses
 
