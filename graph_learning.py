@@ -45,7 +45,8 @@ def create_2bell_bars_graph_w_pop(size_1, size_2, len_bar, num_bars, num_symbols
         barbell_graph.add_edge(prev_node,
                                random.choice(range(size_1, size_1 + size_2)))
 
-    pop = _build_population(population_count=size_1 + size_2 + (len_bar * num_bars), num_symbols=num_symbols)
+    pop = _build_population(population_count=size_1 +
+                            size_2 + (len_bar * num_bars), num_symbols=num_symbols)
 
     return barbell_graph, pop
 
@@ -53,7 +54,8 @@ def create_2bell_bars_graph_w_pop(size_1, size_2, len_bar, num_bars, num_symbols
 def create_bipartite_graph_w_pop(group_1, group_2, num_symbols=NUM_SYMBOLS):
     G = nx.bipartite.complete_bipartite_graph(group_1, group_2)
 
-    pop = _build_population(population_count=group_1 + group_2, num_symbols=num_symbols)
+    pop = _build_population(population_count=group_1 +
+                            group_2, num_symbols=num_symbols)
 
     return G, pop
 
@@ -61,7 +63,8 @@ def create_bipartite_graph_w_pop(group_1, group_2, num_symbols=NUM_SYMBOLS):
 def create_lollipop_graph_w_pop(candy_nodes, stick_nodes, num_symbols=NUM_SYMBOLS):
     G = nx.lollipop_graph(candy_nodes, stick_nodes)
 
-    pop = _build_population(population_count=candy_nodes + stick_nodes, num_symbols=num_symbols)
+    pop = _build_population(population_count=candy_nodes +
+                            stick_nodes, num_symbols=num_symbols)
 
     return G, pop
 
@@ -79,7 +82,7 @@ def distinctness(speaker, population):
 
 
 def select_neighbor(graph, node: int):
-    neighbors = list(graph.neighbors(node))   
+    neighbors = list(graph.neighbors(node))
     return random.choice(neighbors)
 
 
@@ -100,7 +103,8 @@ def run_simulation_step(interaction_graph, population):
     random.shuffle(indices)
     for speaker in indices:
         # pick a random neighbor and interact w/ them
-        interact(population[speaker], population[select_neighbor(interaction_graph, speaker)])
+        interact(population[speaker], population[select_neighbor(
+            interaction_graph, speaker)])
 
 
 # random drift (together) after interactions? more impact on barbell-type graphs, accents
@@ -116,14 +120,63 @@ def run_simulation_step(interaction_graph, population):
 # barabási–albert?
 
 
-g, pop = create_regular_graph_w_pop(10, 4)
-print(np.mean([distinctness(pop[i], pop) for i in range(len(pop))]))
+def run_simulation(type: str, num_runs: int, **kwargs):
+    """_summary_
 
-for i in range(10000):
-    run_simulation_step(g, pop)
-    print(np.mean([distinctness(pop[i], pop) for i in range(len(pop))]))
-    
-print(pop)
+    Args:
+        type (str): which graph are you making?
+        num_runs (int): how many times do we run it?
+    Kwargs:
+        nodes_a (int): first node count
+        nodes_b (int): second node count, if needed
+        neighbors (int): number of neighbors in regular/small_world. must be even  
+        len_bar (int): length of bars in barbells+
+        num_bars (int): number of bars in barbells+
+        num_symbols (int): optional, defaults to NUM_SYMBOLS constant 
+    """
+    g = None
+    pop = None
+
+    match type:
+        case 'regular':
+            g, pop = create_regular_graph_w_pop(kwargs['nodes_a'], kwargs['neighbors'],
+                                                kwargs['num_symbols'] if 'num_symbols' in kwargs else NUM_SYMBOLS)
+        case 'small_world':
+            g, pop = create_small_world_graph_w_pop(kwargs['nodes_a'], kwargs['neighbors'], kwargs['rewire_odds'],
+                                                    kwargs['num_symbols'] if 'num_symbols' in kwargs else NUM_SYMBOLS)
+        case 'barbells':
+            g, pop = create_2bell_bars_graph_w_pop(kwargs['nodes_a'], kwargs['nodes_b'], kwargs['len_bar'], kwargs['num_bars'],
+                                                   kwargs['num_symbols'] if 'num_symbols' in kwargs else NUM_SYMBOLS)
+        case 'bipartite':
+            g, pop = create_bipartite_graph_w_pop(kwargs['nodes_a'], kwargs['nodes_b'],
+                                                  kwargs['num_symbols'] if 'num_symbols' in kwargs else NUM_SYMBOLS)
+        case 'lollipop':
+            g, pop = create_lollipop_graph_w_pop(kwargs['nodes_a'], kwargs['nodes_b'],
+                                                 kwargs['num_symbols'] if 'num_symbols' in kwargs else NUM_SYMBOLS)
+
+    distinctnesses = []  # 2d array
+    for i in range(num_runs):
+        run_distinctnesses = []
+
+        run_g = g.copy()
+        run_pop = pop.copy()
+        while not np.allclose(run_pop, run_pop[0], atol=1e-10):
+            run_simulation_step(run_g, run_pop)
+
+            run_distinctnesses.append(
+                (np.mean([distinctness(run_pop[k], run_pop) for k in range(len(run_pop))])))
+
+        distinctnesses.append(run_distinctnesses)
+
+    return distinctnesses
+
+
+d = run_simulation(type='bipartite', num_runs=50,
+                   nodes_a=1, nodes_b=19, neighbors=4, rewire_odds=0.2)
+
+print([len(a) for a in d])
+print(np.mean([len(a) for a in d]))
+
 
 # nx.draw(g, with_labels=True, node_color='pink', node_size=100)
 # plt.show()
