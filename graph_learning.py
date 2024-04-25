@@ -55,6 +55,15 @@ def create_2bell_bars_graph_w_pop(size_1, size_2, len_bar, num_bars, num_symbols
     return barbell_graph, pop
 
 
+def create_complete_graph_w_pop(group1, num_symbols):
+    G = nx.complete_graph(group1)
+
+    pop = _build_population(population_count=group1,
+                            num_symbols=num_symbols)
+
+    return G, pop
+
+
 def create_bipartite_graph_w_pop(group_1, group_2, num_symbols):
     G = nx.bipartite.complete_bipartite_graph(group_1, group_2)
 
@@ -131,13 +140,16 @@ def run_simulation(**kwargs):
     """
 
     distinctnesses = []  # 2d array
-    for _ in range(kwargs['num_runs']):
+    for i in range(kwargs['num_runs']):
         run_distinctnesses = []
 
-        match ['type']:
+        match kwargs['type']:
             case 'regular':
                 run_g, run_pop = create_regular_graph_w_pop(kwargs['nodes_a'], kwargs['neighbor'],
                                                             kwargs['num_symbols'])
+            case 'complete':
+                run_g, run_pop = create_complete_graph_w_pop(kwargs['nodes_a'],
+                                                             kwargs['num_symbols'])
             case 'small_world':
                 run_g, run_pop = create_small_world_graph_w_pop(kwargs['nodes_a'], kwargs['neighbor'], kwargs['rewire'],
                                                                 kwargs['num_symbols'])
@@ -155,6 +167,10 @@ def run_simulation(**kwargs):
             # draw graph once
             draw_graph(run_g)
             kwargs['show_graph'] = False
+
+        # debug
+        print(f"{i+1} clustering: {nx.average_clustering(run_g)}")
+        print(f"{i+1} average shortest path: {nx.average_shortest_path_length(run_g)}")
 
         while not np.allclose(run_pop, run_pop[0], atol=kwargs['distinct_thresh']):
             sim_step(run_g, run_pop, kwargs['l_coefficient'])
