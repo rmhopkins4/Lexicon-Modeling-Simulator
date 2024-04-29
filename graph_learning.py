@@ -184,14 +184,6 @@ def run_simulation(**kwargs):
     return distinctnesses
 
 
-"""
-d = run_simulation(type='bipartite', num_runs=50,
-                   nodes_a=1, nodes_b=19, neighbors=4, rewire_odds=0.2)
-
-print([len(a) for a in d])  # len is number of steps taken
-print(np.mean([len(a) for a in d]))  # mean number of steps taken for all sims
-"""
-
 # random drift (together) after interactions? more impact on barbell-type graphs, accents
 #   depends on how i model current state, difficult to do w/ homesign method, which in all likelihood i will keep
 
@@ -199,7 +191,7 @@ print(np.mean([len(a) for a in d]))  # mean number of steps taken for all sims
 # barbell, only two distinct initial agreements, tweak sizes (relative, total) to predict which wins and how long it takes?
 # bipartite, compare w/ barbell
 # lollipop, how long to fully agree depending on length of stick and size of candy?
-# small world vs regular, how much does a small set of extra connections help w/ consensus time?
+# small world vs regular, how much does a small set of extra connections help/hurt consensus time?
 #
 
 # barabási–albert?
