@@ -2,20 +2,30 @@ import argparse
 from argparse import RawTextHelpFormatter
 import textwrap
 
-import levenshtein as gl
+import levenshtein_learning as ll
 
 import numpy as np
 
-NUM_SYMBOLS = 10
-LEARN_COEFFICIENT = 0.2
-DISTINCTNESS_THRESHOLD = 1e-10
+import ast
+
+STRING_LENGTHS = [5, 6, 7]
+IGNORE_ODDS = 0.1
+MESS_UP_ODDS = 0.1
 
 parser = argparse.ArgumentParser(
     prog='',
-    description='Lexicon consensus modeling using graphs',
+    description='Lexicon consensus modeling on strings using graphs',
     epilog='',
     formatter_class=RawTextHelpFormatter  # fixes newline issues
 )
+
+
+def parse_list(input_str):
+    try:
+        return ast.literal_eval(input_str)
+    except (SyntaxError, ValueError) as e:
+        raise argparse.ArgumentTypeError(f"Invalid list format: {input_str}")
+
 
 # type, number of runs, learn_coefficient kwargs(nodes_a, nodes_b, neighbors, num_symbols, len_bar, num_bars, ...)
 parser.add_argument('type', action='store', type=str, help=textwrap.dedent(
@@ -28,12 +38,12 @@ parser.add_argument('type', action='store', type=str, help=textwrap.dedent(
     lollipop: 'nodes_a', 'nodes_b'"""))
 parser.add_argument('num_runs', action='store', type=int,
                     help='number of distinct simulations, averaged')
-parser.add_argument('num_symbols', nargs='?', action='store', help='number of possible symbols [HAS DEFAULT]',
-                    type=int, default=NUM_SYMBOLS)
-parser.add_argument('l_coefficient', nargs='?', action='store', help='how quickly an agent learns [HAS DEFAULT]',
-                    type=float, default=LEARN_COEFFICIENT)
-parser.add_argument('distinct_thresh', nargs='?', action='store', help='threshold for considering agents\' idiolects distinct [HAS DEFAULT]',
-                    type=float, default=DISTINCTNESS_THRESHOLD)
+parser.add_argument('string_lengths', action='store', help='length of strings [HAS DEFAULT]',
+                    type=parse_list, default=STRING_LENGTHS)
+parser.add_argument('ignore_odds', nargs='?', action='store', help='odds an interaction is ignored [HAS DEFAULT]',
+                    type=float, default=IGNORE_ODDS)
+parser.add_argument('mess_up_odds', nargs='?', action='store', help='odds an interaction is messed-up [HAS DEFAULT]',
+                    type=float, default=MESS_UP_ODDS)
 parser.add_argument('--nodes_a', action='store', type=int,
                     help='number of nodes in primary structure')
 parser.add_argument('--nodes_b', action='store', type=int,
@@ -50,8 +60,9 @@ parser.add_argument('-show_graph', action='store_true',
                     help='toggles showing (one example) graph before simulations')
 
 args = vars(parser.parse_args())
-output = gl.run_simulation(**args)
+# print(args)
+output = ll.run_simulation_string(**args)
 
-print([len(a) for a in output])  # len is number of steps taken
+print(output)  # len is number of steps taken
 # mean number of steps taken for all sims
-print(np.mean([len(a) for a in output]))
+print(np.mean(output))

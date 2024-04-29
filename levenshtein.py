@@ -101,6 +101,9 @@ def select_neighbor(graph, node: int):
 
 def interact(speaker, listener, learn_coefficient):
     performed_symbol = np.random.choice(len(speaker), p=speaker)
+
+    # Linear-Reward-Penalty
+
     # non-performed symbols become less common
     listener[np.arange(len(listener) != performed_symbol)
              ] *= (1-learn_coefficient)
@@ -116,8 +119,10 @@ def sim_step(interaction_graph, population, learn_coefficient):
     random.shuffle(indices)
     for speaker in indices:
         # pick a random neighbor and interact w/ them
-        interact(population[speaker], population[select_neighbor(
-            interaction_graph, speaker)], learn_coefficient)
+        interact(population[speaker],
+                 population[select_neighbor(
+                     interaction_graph, speaker)],
+                 learn_coefficient)
 
 
 def run_simulation(**kwargs):
@@ -130,12 +135,14 @@ def run_simulation(**kwargs):
         num_symbols (int): number of possible symbols
         l_coefficient (float): how quickly an agent learns
         distinct_thresh (float): threshold for considering agents\' idiolects distinct
+
         nodes_a (int): first node count
         nodes_b (int): second node count, if needed
         neighbor (int): number of neighbors in regular/small_world. must be even
         rewire (float): odds to rewire edge in small_world graph
         len_bar (int): length of bars in barbells+ graph
         num_bars (int): number of bars in barbells+ graph
+
         show_graph (bool): generate a bonus graph?
     """
 
