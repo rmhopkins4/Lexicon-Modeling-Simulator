@@ -5,14 +5,12 @@ import numpy as np
 import random
 import pprint
 
-# RANDOM_SEED = 118755212
-# random.seed(RANDOM_SEED)
-DISTINCTNESS_THRESHOLD = 1e-10
 
-
-def draw_graph(graph, color='blue', size=100):
-    nx.draw(graph, with_labels=True, node_color=color, node_size=size)
-    plt.show()
+def draw_graph(graph, color='green', size=100, abort=False):
+    pos = nx.kamada_kawai_layout(graph)
+    nx.draw(graph, pos=pos, with_labels=True, node_color=color, node_size=size)
+    if not abort:
+        plt.show()
 
 
 def _build_population(population_count, num_symbols):
@@ -108,7 +106,8 @@ def interact(speaker, listener, learn_coefficient):
     listener[np.arange(len(listener) != performed_symbol)
              ] *= (1-learn_coefficient)
     # performed symbol becomes more common
-    listener[performed_symbol] += learn_coefficient * (1-learn_coefficient)
+    listener[performed_symbol] += (learn_coefficient *
+                                   (1-listener[performed_symbol]))
     # make sure sum is still 1
     listener /= np.sum(listener)
 
@@ -144,9 +143,13 @@ def run_simulation(**kwargs):
         num_bars (int): number of bars in barbells+ graph
 
         show_graph (bool): generate a bonus graph?
+        debug (bool):
+        metrics (bool):
     """
 
-    distinctnesses = []  # 2d array
+    iterations_list = []  # 2d array
+    clusterings_list = []  # array
+    s_paths_list = []  # array
     for i in range(kwargs['num_runs']):
         run_distinctnesses = []
 
@@ -175,9 +178,8 @@ def run_simulation(**kwargs):
             draw_graph(run_g)
             kwargs['show_graph'] = False
 
-        # debug
-        print(f"{i+1} clustering: {nx.average_clustering(run_g)}")
-        print(f"{i+1} average shortest path: {nx.average_shortest_path_length(run_g)}")
+        clusterings_list.append(nx.average_clustering(run_g))
+        s_paths_list.append(nx.average_shortest_path_length(run_g))
 
         while not np.allclose(run_pop, run_pop[0], atol=kwargs['distinct_thresh']):
             sim_step(run_g, run_pop, kwargs['l_coefficient'])
@@ -185,11 +187,14 @@ def run_simulation(**kwargs):
             run_distinctnesses.append(
                 (np.mean([distinctness(run_pop[k], run_pop) for k in range(len(run_pop))])))
 
-        distinctnesses.append(run_distinctnesses)
-        print(f"{len(distinctnesses)}/{kwargs['num_runs']}")
+        iterations_list.append(len(run_distinctnesses))
+        if kwargs['debug']:
+            print(f"{len(iterations_list)}/{kwargs['num_runs']}")
 
-    return distinctnesses
-
+    if kwargs['metrics']:
+        return iterations_list, clusterings_list, s_paths_list
+    else:
+        return iterations_list, None, None
 
 # random drift (together) after interactions? more impact on barbell-type graphs, accents
 #   depends on how i model current state, difficult to do w/ homesign method, which in all likelihood i will keep

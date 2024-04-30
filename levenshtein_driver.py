@@ -52,17 +52,25 @@ parser.add_argument('--neighbor', action='store', type=int,
                     help='custom number of neighbors (if applicable), must be even')
 parser.add_argument('--rewire', action='store', type=float,
                     help='odds to rewire edge small_world graph')
-parser.add_argument('--bar_len', action='store', type=int,
+parser.add_argument('--len_bar', action='store', type=int,
                     help='length of bar in barbells+ graph')
 parser.add_argument('--num_bars', action='store', type=int,
                     help='number of bars in barbells+ graph')
 parser.add_argument('-show_graph', action='store_true',
                     help='toggles showing (one example) graph before simulations')
+parser.add_argument('-show_words', action='store_true',
+                    help='toggles showing (one example) list of words before and after simulations')
+parser.add_argument('-hiragana', action='store_true',
+                    help="toggles using hiragana to ensure readable result")
+parser.add_argument('--preview', action='store', type=parse_list,
+                    help='step number to preview the words (one time). requires -show_words enabled')
+parser.add_argument('-debug', action='store_true',
+                    help="toggle prints on")
 
 args = vars(parser.parse_args())
 # print(args)
 output = ll.run_simulation_string(**args)
 
-print(output)  # len is number of steps taken
+# print(output)  # len is number of steps taken
 # mean number of steps taken for all sims
-print(np.mean(output))
+print(np.mean(output), end='')

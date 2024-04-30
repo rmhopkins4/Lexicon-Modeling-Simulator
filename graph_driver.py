@@ -2,13 +2,13 @@ import argparse
 from argparse import RawTextHelpFormatter
 import textwrap
 
-import graph_driver as gl
+import graph_learning as gl
 
 import numpy as np
 
 NUM_SYMBOLS = 10
-LEARN_COEFFICIENT = 0.2
-DISTINCTNESS_THRESHOLD = 1e-10
+LEARN_COEFFICIENT = 0.01
+DISTINCTNESS_THRESHOLD = 1e-8
 
 parser = argparse.ArgumentParser(
     prog='',
@@ -42,16 +42,24 @@ parser.add_argument('--neighbor', action='store', type=int,
                     help='custom number of neighbors (if applicable), must be even')
 parser.add_argument('--rewire', action='store', type=float,
                     help='odds to rewire edge small_world graph')
-parser.add_argument('--bar_len', action='store', type=int,
+parser.add_argument('--len_bar', action='store', type=int,
                     help='length of bar in barbells+ graph')
 parser.add_argument('--num_bars', action='store', type=int,
                     help='number of bars in barbells+ graph')
 parser.add_argument('-show_graph', action='store_true',
                     help='toggles showing (one example) graph before simulations')
+parser.add_argument('-debug', action='store_true',
+                    help="toggle prints on")
+parser.add_argument('-metrics', action='store_true',
+                    help='toggle advanced metrics returned as tuple')
 
 args = vars(parser.parse_args())
-output = gl.run_simulation(**args)
+iterations, clusterings, shortest_paths = gl.run_simulation(**args)
 
-print([len(a) for a in output])  # len is number of steps taken
+# print([len(a) for a in distinctnesses])  # len is number of steps taken
 # mean number of steps taken for all sims
-print(np.mean([len(a) for a in output]))
+print({
+    'iterations': iterations,
+    'clusterings': clusterings,
+    'shortest_paths': shortest_paths
+})

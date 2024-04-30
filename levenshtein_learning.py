@@ -6,17 +6,30 @@ import Levenshtein as lev
 import random
 
 
-def draw_graph(graph, color='blue', size=100):
-    nx.draw(graph, with_labels=True, node_color=color, node_size=size)
-    plt.show()
+def draw_graph(graph, color='blue', size=100, label_offset=(0.1, 0.1), abort=False, pos=None):
+    if pos == None:
+        pos = nx.kamada_kawai_layout(graph)  # Generate layout once
+    nx.draw(graph, pos=pos, with_labels=True,
+            node_color=color, node_size=size)
+    # Offset label positions
+    label_pos = {k: (x, y + label_offset[1]) for k, (x, y) in pos.items()}
+    nx.draw_networkx_labels(graph, pos=label_pos,
+                            labels=nx.get_node_attributes(graph, 'label'))
+    if not abort:
+        plt.show()
 
 
 # Function to randomly generate initial strings for agents
 def build_population_string(num_agents, string_lengths):
-    return [''.join(
-        random.choices('abcdefghijklmnopqrstuvwxyz',
-                       k=random.choice(string_lengths)))
-            for _ in range(num_agents)]
+    if 'lang' not in globals() or not lang:
+        return [''.join(
+            random.choices('abcdefghijklmnopqrstuvwxyz',
+                           k=random.choice(string_lengths)))
+                for _ in range(num_agents)]
+    else:
+        return [''.join(
+            random.choices('あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわを',
+                           k=random.choice(string_lengths))) for _ in range(num_agents)]
 
 
 def create_regular_graph_w_pop_string(nodes, neighbors, string_lengths):
@@ -100,7 +113,7 @@ def select_neighbor(graph, node: int):
 def interact_string(speak_string, listen_string, ignore_odds=0.0, mess_up_odds=0.0):
     # Calculate the Levenshtein distance between the input and destination strings
     distance_before = lev.distance(listen_string, speak_string)
-    if distance_before == 0 or ignore_odds > random.random():
+    if distance_before == 0 or ignore_odds >= random.random():
         return listen_string
 
     # Get the edit operations needed to change input_string to destination_string
@@ -113,8 +126,8 @@ def interact_string(speak_string, listen_string, ignore_odds=0.0, mess_up_odds=0
         selected_edit = random.choice(edit_operations)
 
         # perhaps change it
-        if mess_up_odds > random.random():
-            if selected_edit[0] != 'delete':
+        if mess_up_odds >= random.random():
+            if selected_edit[0] != 'eeeee':
                 # choose which to modify
                 index_to_change = random.choice([1, 2])
                 affected_string_len = len(
@@ -174,12 +187,19 @@ def run_simulation_string(**kwargs):
         len_bar (int): length of bars in barbells+ graph
         num_bars (int): number of bars in barbells+ graph
 
-        show_graph (bool)
+        show_graph (bool):
+        show_words (bool):
+        hiragana (bool):
+        preview (list[int]):
+        debug (bool):
 
     """
 
+    global lang
+    lang = kwargs['hiragana']
+
     iterations_list = []
-    for i in range(kwargs['num_runs']):
+    for _ in range(kwargs['num_runs']):
         run_iterations = 0
 
         match kwargs['type']:
@@ -202,10 +222,13 @@ def run_simulation_string(**kwargs):
                 run_g, run_pop = create_lollipop_graph_w_pop_string(kwargs['nodes_a'], kwargs['nodes_b'],
                                                                     kwargs['string_lengths'])
 
-        if kwargs['show_graph']:
+        if kwargs['show_graph'] and kwargs['debug']:
             # draw graph once
             draw_graph(run_g)
             kwargs['show_graph'] = False
+
+        if kwargs['show_words'] and kwargs['debug']:
+            print(f"Before: {run_pop}")
 
         # average distance
         while not np.mean([lev.distance(run_pop[i], run_pop[j])
@@ -217,8 +240,19 @@ def run_simulation_string(**kwargs):
                 run_g, run_pop, kwargs['ignore_odds'], kwargs['mess_up_odds'])
             run_iterations += 1
 
+            # show previews, requires show_words to be true
+            if kwargs['preview'] != None and kwargs['debug']:
+                if run_iterations in kwargs['preview']:
+                    print(f"P {run_iterations}: {run_pop}")
+
+        if kwargs['show_words'] and kwargs['debug']:
+            # show before-and-after once
+            print(f"After ({run_iterations}):{run_pop}")
+            kwargs['show_words'] = False
+
         iterations_list.append(run_iterations)
-        print(f"{len(iterations_list)}/{kwargs['num_runs']}")
+        if kwargs['debug']:
+            print(f"{len(iterations_list)}/{kwargs['num_runs']}")
 
     return iterations_list
 
@@ -246,15 +280,3 @@ def run_simulation_string(**kwargs):
 
     return agents
     """
-
-
-"""
-# Example usage
-num_agents = 10
-string_length = [5, 6, 7]
-max_iterations = 10000
-
-final_strings = run_simulation_string(
-    num_agents, string_length, max_iterations, 0.1, 0.1)
-print("Final strings:", final_strings)
-"""
