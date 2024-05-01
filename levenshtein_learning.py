@@ -28,7 +28,7 @@ def build_population_string(num_agents, string_lengths):
                 for _ in range(num_agents)]
     else:
         return [''.join(
-            random.choices('あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわを',
+            random.choices('あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん',
                            k=random.choice(string_lengths))) for _ in range(num_agents)]
 
 
