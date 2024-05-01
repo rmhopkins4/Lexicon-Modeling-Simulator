@@ -105,24 +105,51 @@ def string_word_length():
 
 def alphabet_length():
     # eng alphabet
-    eng_result = float(call_command(
-        ['python', 'levenshtein_driver.py',
-         'small_world', '500', '[5, 6, 7]',
-         '0.1', '0.1', '--nodes_a', '20', '--neighbor', '4', '--rewire', '0.25']
-    ))
-    print(eng_result)
+    eng_result = []
+    for i in range(100):
+        eng_result.append(
+            float(call_command(
+                ['python', 'levenshtein_driver.py',
+                 'small_world', '1', '[5, 6, 7]',
+                 '0.1', '0.1', '--nodes_a', '20', '--neighbor', '4', '--rewire', '0.25']
+            ))
+        )
+    # eng_result = float(call_command(
+    #     ['python', 'levenshtein_driver.py',
+    #      'small_world', '500', '[5, 6, 7]',
+    #      '0.1', '0.1', '--nodes_a', '20', '--neighbor', '4', '--rewire', '0.25']
+    # ))
+    print(sum(eng_result)/len(eng_result))
 
     # jpn hiragana
-    jpn_result = float(call_command(
-        ['python', 'levenshtein_driver.py',
-         'small_world', '500', '[5, 6, 7]',
-         '0.1', '0.1', '--nodes_a', '20', '--neighbor', '4', '--rewire', '0.25', '-hiragana']
-    ))
-    print(jpn_result)
+    jpn_result = []
+    for _ in range(100):
+        jpn_result.append(
+            float(call_command(
+                ['python', 'levenshtein_driver.py',
+                 'small_world', '1', '[5, 6, 7]',
+                 '0.1', '0.1', '--nodes_a', '20', '--neighbor', '4', '--rewire', '0.25', '-hiragana']
+            ))
+        )
+    # jpn_result = float(call_command(
+    #     ['python', 'levenshtein_driver.py',
+    #      'small_world', '500', '[5, 6, 7]',
+    #      '0.1', '0.1', '--nodes_a', '20', '--neighbor', '4', '--rewire', '0.25', '-hiragana']
+    # ))
+    print(sum(jpn_result)/len(jpn_result))
 
-    data.plot_2d_bars([eng_result, jpn_result],
-                      '0 = english: 26 letters, 1 = japanese: 45 characters', '# simulations', 'string consensus, 500 runs,[5, 6, 7] length\n4-neighbor 25% rewire small-world graph')
+    # data.plot_2d_bars([eng_result, jpn_result], '0 = english: 26 letters, 1 = japanese: 46 characters', '# simulations', 'string consensus, 500 runs,[5, 6, 7] length\n4-neighbor 25% rewire small-world graph')
+
+    max_val = max(max(eng_result), max(jpn_result))
+
+    data.plot_22d_bars(eng_result, jpn_result, 'simulation #', '# runs',
+                       'eng string consensus, 100 runs, [5,6,7] length\n4-neighbor 25% rewire small-world graph',
+                       'jpn string consensus, 100 runs, [5,6,7] length\n4-neighbor 25% rewire small-world graph',
+                       max_val)
+
     plt.savefig('figures/alphabet_length.png')
+
+    plt.show()
 
 
 def _show_current_state(graph, words, label, pos=None, filename=None):
@@ -204,7 +231,26 @@ def simulate_nicaragua():
     print(school_r)
 
 
-# simulate_nicaragua()
-x = [449, 1063, 601, 412, 662, 282, 856, 646, 876, 229, 499, 1131, 854, 692, 467, 414, 876, 525, 332, 517, 491, 871, 448, 625, 193,
-     514, 235, 1070, 1153, 471, 446, 614, 867, 250, 1919, 881, 472, 297, 329, 1982, 516, 1316, 542, 1298, 526, 1117, 399, 289, 717, 306]
-print(sum(x)/len(x))
+def avg(list):
+    return sum(list) / len(list)
+
+
+def learn_coefficient_test():
+    outputs = [0]
+    for lc in range(1, 10):
+        command = ['python', 'graph_driver.py', 'lollipop',
+                   '25', '10',
+                   str(lc * 0.1),
+                   '--nodes_a', '10', '--nodes_b', '10']
+        outputs.append(avg((data.parse_string_to_dict(
+            call_command(command))['iterations'])))
+        print(outputs)
+
+    data.plot_2d_bars(outputs, 'learn coefficient (x0.1)', '# runs',
+                      'proportion consensus, 9x25 runs, 10 symbols\n10,10 node lollipop graph')
+
+    plt.savefig('figures/learn_coefficient_lolli.png')
+
+
+# learn coefficient effect on proportion
+learn_coefficient_test()

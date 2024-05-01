@@ -125,6 +125,50 @@ def plot_2d_bars(data, x_label, y_label, title, max_value=None):
         plt.ylim(0, max_value)
 
 
+def plot_22d_bars(data1, data2, x_label, y_label, title1, title2, max_value=None):
+    fig, (ax1, ax2) = plt.subplots(
+        1, 2, figsize=(10, 5))  # Adjust figsize as needed
+
+    # Calculate averages
+    avg1 = np.mean(data1)
+    avg2 = np.mean(data2)
+
+    norm1 = plt.Normalize(min(data1), max(data1))
+    cmap1 = plt.get_cmap('viridis')
+    colors1 = cmap1(norm1(data1))
+
+    ax1.bar(range(len(data1)), data1, color=colors1)
+    ax1.axhline(y=avg1, color='r', linestyle='--',
+                label=f'Average: {avg1:.2f}')  # Add horizontal line
+    ax1.set_xlabel(x_label)
+    ax1.set_ylabel(y_label)
+    ax1.set_title(title1)
+    ax1.xaxis.set_major_locator(plt.MaxNLocator(
+        integer=True))  # Set integer ticks on x-axis
+
+    norm2 = plt.Normalize(min(data2), max(data2))
+    cmap2 = plt.get_cmap('viridis')
+    colors2 = cmap2(norm2(data2))
+
+    ax2.bar(range(len(data2)), data2, color=colors2)
+    ax2.axhline(y=avg2, color='r', linestyle='--',
+                label=f'Average: {avg2:.2f}')  # Add horizontal line
+    ax2.set_xlabel(x_label)
+    ax2.set_ylabel(y_label)
+    ax2.set_title(title2)
+    ax2.xaxis.set_major_locator(plt.MaxNLocator(
+        integer=True))  # Set integer ticks on x-axis
+
+    if max_value is not None:
+        ax1.set_ylim(0, max_value)
+        ax2.set_ylim(0, max_value)
+
+    ax1.legend()  # Add legend to first subplot
+    ax2.legend()  # Add legend to second subplot
+
+    plt.tight_layout()  # Adjust subplots to prevent overlap
+
+
 def associate_strings_with_nodes(graph, strings):
 
     for i, string in enumerate(strings):
