@@ -1,3 +1,4 @@
+import Levenshtein as lev
 import networkx as nx
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
@@ -7,6 +8,7 @@ import os
 
 import data
 import levenshtein_learning as ll
+
 
 env = os.environ.copy()
 venv_path = ".venv"
@@ -157,8 +159,8 @@ def metric_effects(nodes: int, runs: int):
     for rewire_odds in range(1, 10):
         r = call_command(
             ['python', 'graph_driver.py',
-             'small_world', str(runs), '10',
-             '0.2', '--nodes_a', str(nodes),
+             'small_world', str(runs),
+             '--nodes_a', str(nodes),
              '--neighbor', '4', '--rewire', str(rewire_odds * 0.1),
              '-metrics'])
         r = data.parse_string_to_dict(r)
@@ -179,11 +181,30 @@ def metric_effects(nodes: int, runs: int):
         title=f'proportion consensus, 9x{runs} runs, 10 symbols\n' +
         f'{nodes} node 4-neighbor variable-rewire small-world graph')
 
-    plt.savefig('figures/metric_effects_50node.png')
+    plt.savefig(f'figures/metric_effects_{str(nodes)}node.png')
 
 
-# suite
-# metric_effects(10, 1)
-# plt.show()
-# metric_effects(50)
-# plt.show()
+def simulate_nicaragua():
+    # replicates at home w/ 9 family members
+    home_command = ['python', 'graph_driver.py',
+                    'bipartite', '50',
+                    '--nodes_a', '1', '--nodes_b', '9',
+                    '-show_graph']
+
+    # replicates at school w/ 30 students
+    school_command = ['python', 'graph_driver.py',
+                      'complete', '50',
+                      '--nodes_a', '30',
+                      '-show_graph']
+
+    # home_r = (call_command(home_command))
+    # print(home_r)
+
+    school_r = call_command(school_command)
+    print(school_r)
+
+
+# simulate_nicaragua()
+x = [449, 1063, 601, 412, 662, 282, 856, 646, 876, 229, 499, 1131, 854, 692, 467, 414, 876, 525, 332, 517, 491, 871, 448, 625, 193,
+     514, 235, 1070, 1153, 471, 446, 614, 867, 250, 1919, 881, 472, 297, 329, 1982, 516, 1316, 542, 1298, 526, 1117, 399, 289, 717, 306]
+print(sum(x)/len(x))

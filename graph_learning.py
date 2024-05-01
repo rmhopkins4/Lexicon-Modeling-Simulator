@@ -106,8 +106,8 @@ def interact(speaker, listener, learn_coefficient):
     listener[np.arange(len(listener) != performed_symbol)
              ] *= (1-learn_coefficient)
     # performed symbol becomes more common
-    listener[performed_symbol] += (learn_coefficient *
-                                   (1-listener[performed_symbol]))
+    listener[performed_symbol] += (learn_coefficient)  # *
+    #                              (1 - listener[performed_symbol]))
     # make sure sum is still 1
     listener /= np.sum(listener)
 
@@ -181,8 +181,12 @@ def run_simulation(**kwargs):
         clusterings_list.append(nx.average_clustering(run_g))
         s_paths_list.append(nx.average_shortest_path_length(run_g))
 
-        while not np.allclose(run_pop, run_pop[0], atol=kwargs['distinct_thresh']):
+        while not np.all([np.allclose(row, run_pop[0], atol=kwargs['distinct_thresh']) for row in run_pop]):
+
             sim_step(run_g, run_pop, kwargs['l_coefficient'])
+
+            if kwargs['debug']:
+                print(run_pop)
 
             run_distinctnesses.append(
                 (np.mean([distinctness(run_pop[k], run_pop) for k in range(len(run_pop))])))

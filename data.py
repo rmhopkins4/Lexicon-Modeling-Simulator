@@ -107,7 +107,7 @@ def plot_3d_points_with_regression(independent_1, independent_2, dependent, i1_l
     plt.title(f"{title}\nR²:{r_squared}")
 
 
-def plot_2d_bars(data, x_label, y_label, title):
+def plot_2d_bars(data, x_label, y_label, title, max_value=None):
     plt.figure()
     norm = plt.Normalize(min(data), max(data))
     cmap = plt.get_cmap('viridis')
@@ -120,6 +120,9 @@ def plot_2d_bars(data, x_label, y_label, title):
     plt.title(title)
     plt.gca().xaxis.set_major_locator(
         plt.MaxNLocator(integer=True))  # Set integer ticks on x-axis
+
+    if max_value is not None:
+        plt.ylim(0, max_value)
 
 
 def associate_strings_with_nodes(graph, strings):

@@ -7,8 +7,8 @@ import graph_learning as gl
 import numpy as np
 
 NUM_SYMBOLS = 10
-LEARN_COEFFICIENT = 0.01
-DISTINCTNESS_THRESHOLD = 1e-8
+LEARN_COEFFICIENT = 0.2
+DISTINCTNESS_THRESHOLD = 1e-3
 
 parser = argparse.ArgumentParser(
     prog='',
@@ -30,7 +30,7 @@ parser.add_argument('num_runs', action='store', type=int,
                     help='number of distinct simulations, averaged')
 parser.add_argument('num_symbols', nargs='?', action='store', help='number of possible symbols [HAS DEFAULT]',
                     type=int, default=NUM_SYMBOLS)
-parser.add_argument('l_coefficient', nargs='?', action='store', help='how quickly an agent learns [HAS DEFAULT]',
+parser.add_argument('l_coefficient', nargs='?', action='store', help='how quickly an agent learns',
                     type=float, default=LEARN_COEFFICIENT)
 parser.add_argument('distinct_thresh', nargs='?', action='store', help='threshold for considering agents\' idiolects distinct [HAS DEFAULT]',
                     type=float, default=DISTINCTNESS_THRESHOLD)
@@ -54,8 +54,8 @@ parser.add_argument('-metrics', action='store_true',
                     help='toggle advanced metrics returned as tuple')
 
 args = vars(parser.parse_args())
+# print(args)
 iterations, clusterings, shortest_paths = gl.run_simulation(**args)
-
 # print([len(a) for a in distinctnesses])  # len is number of steps taken
 # mean number of steps taken for all sims
 print({
