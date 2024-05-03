@@ -194,3 +194,25 @@ def parse_string_to_dict(string):
     except:
         print("Error: Invalid string representation of dictionary")
         return None
+
+
+# Define the strings at different time points
+time_points = [10, 20, 30, 40, 50, 100, 150, 200]
+strings = [
+    ['tjjiw', 'aeziz', 'etdos', 'atzupw', 'tduiw', 'ejtup', 'aedjiz', 'btezvpv', 'ejztwe', 'bejipp', 'gsfzl', 'gsfmp', 'gsamq',
+        'igxzr', 'ispqm', 'gxzamr', 'ipemm', 'ypsfmp', 'gxzalm', 'wsfmq', 'biezvpv', 'yieiue', 'yioiue', 'yioiue', 'yiosue'],
+    ['btbjjpv', 'tioz', 'botpv', 'boipv', 'btjdov', 'bopv', 'beoive', 'bjoiuv', 'tbooive', 'tjdov', 'wszfmq', 'isufmq', 'wguzmq',
+        'wguszmq', 'wiuamq', 'wguamq', 'wsuzmq', 'ioiuvmq', 'wguzm', 'wgszmq', 'yioiuv', 'yioiuv', 'yioiuv', 'yioiuv', 'yioiuv'],
+    ['bjioiv', 'bjioiv', 'tbjiov', 'tbjiov', 'bjiov', 'bjiov', 'tbjioive', 'bjiov', 'bjiov', 'tbjioiv', 'wguzmq', 'wgozmq', 'wgozmq',
+        'wgozmq', 'wgozmq', 'wiuzmq', 'wiuzmq', 'wiozmv', 'wiozmq', 'wgozmq', 'yiozuv', 'yiozuv', 'yiozuv', 'yiozuv', 'yiozuv'],
+    ['bjioiv', 'bjioiv', 'bjioie', 'tbjiozv', 'bjioiv', 'tbjioiv', 'tbjioiv', 'bjioziv', 'bjioiv', 'tbjioie', 'wiozmq', 'wiozmq',
+        'wiuzmq', 'wiozmq', 'wiuzmq', 'wiuzuq', 'wiozuq', 'wiozuv', 'wiozmq', 'wiozmq', 'yiozuv', 'yiozuv', 'yiozuv', 'yiozuv', 'yiozuv'],
+    ['bjioiv', 'bjioiv', 'bjioiv', 'bjioiv', 'bjioiv', 'bjioiv', 'bjioiv', 'bjioiv', 'bjioiv', 'bjioiv', 'wiuzmv', 'wiuzmq', 'wiuzmq',
+        'wiuzmv', 'wiuzuv', 'wiuzuv', 'wiuzmv', 'wiuzuv', 'wiuzmq', 'wiuzmv', 'yiozuv', 'yiozuv', 'yiozuv', 'yiozuv', 'yiozuv'],
+    ['yjiouv', 'yjiouv', 'yjiouv', 'yjiouv', 'yjioziv', 'yjiouv', 'yjiouv', 'yjioziv', 'yjiouv', 'yjiouv', 'yjiuzuv', 'yiuzuv', 'yiuzuv',
+        'yjiuzuv', 'yiuzuv', 'yiuzuv', 'yjiuzuv', 'yjiuzuv', 'yiuzuv', 'yiuzuv', 'yjioziv', 'yjiozuv', 'yjiozuv', 'yjiozuv', 'yjiuzuv'],
+    ['yjiouv', 'yjiouv', 'yjiouv', 'yjiouv', 'yjiouv', 'yjiouv', 'yjiozuv', 'yjiozuv', 'yjiouv', 'yjiouv', 'yjiozuv', 'yjiozuv', 'yjiozuv',
+        'yjiozuv', 'yjiozuv', 'yjiozuv', 'yjiozuv', 'yjiozuv', 'yjiozuv', 'yjiozuv', 'yjiozuv', 'yjiozuv', 'yjiozuv', 'yjiozuv', 'yjiozuv'],
+    ['yjiouv', 'yjiouv', 'yjiouv', 'yjiouv', 'yjiouv', 'yjiouv', 'yjiouv', 'yjiouv', 'yjiouv', 'yjiouv', 'yjiozuv', 'yjiozuv', 'yjiozuv',
+        'yjiozuv', 'yjiozuv', 'yjiozuv', 'yjiozuv', 'yjiozuv', 'yjiozuv', 'yjiozuv', 'yjiozuv', 'yjiozuv', 'yjiozuv', 'yjiozuv', 'yjiozuv']
+]
